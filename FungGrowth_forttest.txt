@@ -1,0 +1,65 @@
+Sample_ID	Strain_name	Trial_Type	Growth_rate	Association	Sanger_genus	Isolate_source
+BTF_019	Pseudeurotium (str. BTF_019)	Bd plate	0.076122159	habitat	Pseudeurotium	Eggs
+BTF_020	Cadophora (str. BTF_020)	Bd plate	0.024872159	habitat	Cadophora	Eggs
+BTF_022	Cladosporium (str. BTF_022)	Bd plate	0.070838068	host	Cladosporium	Eggs
+BTF_024	Cladosporium (str. BTF_024)	Bd plate	0.436761364	host	Cladosporium	Eggs
+BTF_036	Neobulgaria (str. BTF_036)	Bd plate	0.04828125	habitat	Neobulgaria	Eggs
+BTF_038	Neobulgaria (str. BTF_038)	Bd plate	0.018394886	habitat	Neobulgaria	Eggs
+BTF_054	Pseudeurotium (str. BTF_054)	Bd plate	0.045440341	habitat	Pseudeurotium	Eggs
+BTF_060	Helotiales (str. BTF_060)	Bd plate	0.000427489	host	Helotiales	Eggs
+BTF_071	Mortierella  (str. BTF_071)	Bd plate	0.332883523	habitat	Mortierella 	Eggs
+BTF_103	Pseudeurotium (str. BTF_103)	Bd plate	0.028366477	habitat	Pseudeurotium	Tadpole
+BTF_104	Mortierella (str. BTF_104)	Bd plate	0.063068182	habitat	Mortierella	Tadpole
+BTF_106	Cladosporium (str. BTF_106)	Bd plate	0.090113636	host	Cladosporium	Metamorph
+BTF_117	Cladosporium (str. BTF_117)	Bd plate	0.071079545	host	Cladosporium	Subadult
+BTF_124	Phaeosphaeria (str. BTF_124)	Bd plate	0.132400568	host	Phaeosphaeria	Subadult
+BTF_127	Geomyces  (str. BTF_127)	Bd plate	0.064375	habitat	Geomyces 	Subadult
+BTF_149	Cladosporium (str. BTF_149)	Bd plate	0.134393939	host	Cladosporium	Adult
+BTF_019	Pseudeurotium (str. BTF_019)	Bd plate	0.043025568	habitat	Pseudeurotium	Eggs
+BTF_020	Cadophora (str. BTF_020)	Bd plate	0.059928977	habitat	Cadophora	Eggs
+BTF_022	Cladosporium (str. BTF_022)	Bd plate	0.044957386	host	Cladosporium	Eggs
+BTF_024	Cladosporium (str. BTF_024)	Bd plate	0.389730114	host	Cladosporium	Eggs
+BTF_036	Neobulgaria (str. BTF_036)	Bd plate	0.082159091	habitat	Neobulgaria	Eggs
+BTF_038	Neobulgaria (str. BTF_038)	Bd plate	0.030213068	habitat	Neobulgaria	Eggs
+BTF_054	Pseudeurotium (str. BTF_054)	Bd plate	0.056136364	habitat	Pseudeurotium	Eggs
+BTF_060	Helotiales (str. BTF_060)	Bd plate	0.000227273	host	Helotiales	Eggs
+BTF_071	Mortierella  (str. BTF_071)	Bd plate	0.156420455	habitat	Mortierella 	Eggs
+BTF_103	Pseudeurotium (str. BTF_103)	Bd plate	0.104190341	habitat	Pseudeurotium	Tadpole
+BTF_104	Mortierella (str. BTF_104)	Bd plate	0.144488636	habitat	Mortierella	Tadpole
+BTF_106	Cladosporium (str. BTF_106)	Bd plate	0.095189394	host	Cladosporium	Metamorph
+BTF_117	Cladosporium (str. BTF_117)	Bd plate	0.115056818	host	Cladosporium	Subadult
+BTF_124	Phaeosphaeria (str. BTF_124)	Bd plate	0.126946023	host	Phaeosphaeria	Subadult
+BTF_127	Geomyces  (str. BTF_127)	Bd plate	0.053039773	habitat	Geomyces 	Subadult
+BTF_149	Cladosporium (str. BTF_149)	Bd plate	0.182575758	host	Cladosporium	Adult
+BTF_019	Pseudeurotium (str. BTF_019)	Control (no Bd) plate	0.061477273	habitat	Pseudeurotium	Eggs
+BTF_020	Cadophora (str. BTF_020)	Control (no Bd) plate	0.104346591	habitat	Cadophora	Eggs
+BTF_022	Cladosporium (str. BTF_022)	Control (no Bd) plate	0.158877841	host	Cladosporium	Eggs
+BTF_024	Cladosporium (str. BTF_024)	Control (no Bd) plate	0.314318182	host	Cladosporium	Eggs
+BTF_036	Neobulgaria (str. BTF_036)	Control (no Bd) plate	0.033892045	habitat	Neobulgaria	Eggs
+BTF_038	Neobulgaria (str. BTF_038)	Control (no Bd) plate	0.052698864	habitat	Neobulgaria	Eggs
+BTF_054	Pseudeurotium (str. BTF_054)	Control (no Bd) plate	0.123210227	habitat	Pseudeurotium	Eggs
+BTF_060	Helotiales (str. BTF_060)	Control (no Bd) plate	0.004296537	host	Helotiales	Eggs
+BTF_071	Mortierella  (str. BTF_071)	Control (no Bd) plate	0.2390625	habitat	Mortierella 	Eggs
+BTF_103	Pseudeurotium (str. BTF_103)	Control (no Bd) plate	0.057642045	habitat	Pseudeurotium	Tadpole
+BTF_104	Mortierella (str. BTF_104)	Control (no Bd) plate	0.095042614	habitat	Mortierella	Tadpole
+BTF_106	Cladosporium (str. BTF_106)	Control (no Bd) plate	0.04	host	Cladosporium	Metamorph
+BTF_117	Cladosporium (str. BTF_117)	Control (no Bd) plate	0.092670455	host	Cladosporium	Subadult
+BTF_124	Phaeosphaeria (str. BTF_124)	Control (no Bd) plate	0.121960227	host	Phaeosphaeria	Subadult
+BTF_127	Geomyces  (str. BTF_127)	Control (no Bd) plate	0.066818182	habitat	Geomyces 	Subadult
+BTF_149	Cladosporium (str. BTF_149)	Control (no Bd) plate	0.160643939	host	Cladosporium	Adult
+BTF_019	Pseudeurotium (str. BTF_019)	Control (no Bd) plate	0.069005682	habitat	Pseudeurotium	Eggs
+BTF_020	Cadophora (str. BTF_020)	Control (no Bd) plate	0.060255682	habitat	Cadophora	Eggs
+BTF_022	Cladosporium (str. BTF_022)	Control (no Bd) plate	0.099034091	host	Cladosporium	Eggs
+BTF_024	Cladosporium (str. BTF_024)	Control (no Bd) plate	0.194701705	host	Cladosporium	Eggs
+BTF_036	Neobulgaria (str. BTF_036)	Control (no Bd) plate	0.063849432	habitat	Neobulgaria	Eggs
+BTF_038	Neobulgaria (str. BTF_038)	Control (no Bd) plate	0.174019886	habitat	Neobulgaria	Eggs
+BTF_054	Pseudeurotium (str. BTF_054)	Control (no Bd) plate	0.066491477	habitat	Pseudeurotium	Eggs
+BTF_060	Helotiales (str. BTF_060)	Control (no Bd) plate	0.003116883	host	Helotiales	Eggs
+BTF_071	Mortierella  (str. BTF_071)	Control (no Bd) plate	0.369403409	habitat	Mortierella 	Eggs
+BTF_103	Pseudeurotium (str. BTF_103)	Control (no Bd) plate	0.016292614	habitat	Pseudeurotium	Tadpole
+BTF_104	Mortierella (str. BTF_104)	Control (no Bd) plate	0.295795455	habitat	Mortierella	Tadpole
+BTF_106	Cladosporium (str. BTF_106)	Control (no Bd) plate	0.14375	host	Cladosporium	Metamorph
+BTF_117	Cladosporium (str. BTF_117)	Control (no Bd) plate	0.075909091	host	Cladosporium	Subadult
+BTF_124	Phaeosphaeria (str. BTF_124)	Control (no Bd) plate	0.055880682	host	Phaeosphaeria	Subadult
+BTF_127	Geomyces  (str. BTF_127)	Control (no Bd) plate	0.074573864	habitat	Geomyces 	Subadult
+BTF_149	Cladosporium (str. BTF_149)	Control (no Bd) plate	0.149318182	host	Cladosporium	Adult

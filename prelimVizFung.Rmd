@@ -1,0 +1,371 @@
+---
+title: "01_prelimVizFung"
+author: "Alexandra Alexiev"
+date: "7/12/2021"
+output: html_document
+---
+
+These are the preliminary visualizations and statistics for the fungal Bd co-culture experiment. We isolated a variety of fungi off each life stage of CO boreal toads. We then Sanger sequenced to ID them, and chose ~20 to compete against Bd in petri plate co-cultures. We recorded inhibition zones on a Bd lawn, total growth and growth rate of each fungus, and any morphological changes between control and Bd lawn plates with fungus growing on them.
+
+### Packages
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+sessionInfo()
+library(ggplot2)
+library(tidyverse)
+library(multcompView)
+library(viridis)
+
+# setwd("/Users/alal3493/Documents/Projects/02_FungalIsolates/02_preliminaryAnalysis")
+```
+
+### Load in data and functions
+```{r load in data}
+fung_time <- read.delim("Fungal_inhibtime.txt", sep = "\t",
+                        header = T)
+fung_growth <- read.delim("Fungal_growth.txt", sep = "\t",
+                        header = T)
+
+# re-order
+life_list <- c("Eggs", "Tadpole", "Metamorph", "Subadult", "Adult")
+fung_time$Isolate_source <- factor(fung_time$Isolate_source, 
+                                   levels = life_list)
+fung_growth$Isolate_source <- factor(fung_growth$Isolate_source, 
+                                     levels = life_list)
+
+
+# make this function for making tukey group labels for graph later
+# group the Strain_name that are not different each other together.
+generate_label_df <- function(TUKEY, variable){
+ 
+     # Extract labels and factor levels from Tukey post-hoc 
+     Tukey.levels <- TUKEY[[variable]][,4]
+     Tukey.labels <- data.frame(multcompLetters(Tukey.levels)['Letters'])
+     
+     #I need to put the labels in the same order as in the boxplot :
+     Tukey.labels$Strain_name = rownames(Tukey.labels)
+     Tukey.labels = Tukey.labels[order(Tukey.labels$Strain_name) , ]
+     return(Tukey.labels)
+}
+
+# define color scheme
+host_color <- "#81599C"
+habitat_color <- "#14947E"
+```
+
+### Answer some preliminary questions
+
+## Q1: Are certain phylogenetic groups more culturable from toad skin? Of the ones we tested, which were Bd inhibitive? How does this compare to ITS short read whole community data?
+
+We made a krona graph (not in R) and added metadata about individual isolates manually.
+
+
+```{r source of isolates we Sanger seq'd}
+fung_seqdisosource <- read.delim("Fungal_seqdisolatesource.txt", sep = "\t",
+                                 header = T)
+fung_seqdisosource$Isolate_source <- factor(fung_seqdisosource$Isolate_source, 
+                                     levels = life_list)
+
+seqdisosourceplot <- ggplot(fung_seqdisosource, aes(y = value, x = Sanger_genus,
+                                                    fill = Isolate_source)) + 
+    geom_bar(position = "stack", stat = "identity") +
+    labs(y = "Number of Isolates", fill = "Isolate Source") +
+    theme(axis.text.x = element_text(angle = 60, hjust = 1, size = 10),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 14),
+          legend.text = element_text(size = 10),
+          legend.title = element_text(size = 14)) +
+    scale_fill_viridis_d()
+seqdisosourceplot
+# ggsave(filename = "seqdisosourceplot.jpg",
+#        plot = seqdisosourceplot,
+#        path = "Prelim_Figs",
+#        width = 8, height = 5, dpi = 300)
+
+```
+
+
+```{r calculated values}
+# read in BLAST ITS short read and Sanger matched data and add taxonomy to column
+SangerITSshort_resultIDs <- read.delim("SangerITSshort_resultIDs.txt", sep = "\t",
+                        header = T)
+# this file has all the taxonomies for OTU## to add to above file
+taxa_repset <- read.delim("rep_set97_filt_tax_assignments.txt", sep = "\t",
+                        header = F)
+# add in headers that match first file
+colnames(taxa_repset) <- c("subj_accession", "subj_title", "UNITE_match_perc")
+# add taxonomy to subj_title column in SangerITSshort_resultIDs
+SangerITSshort_clean <- SangerITSshort_resultIDs %>%
+    select(-subj_title) %>%
+    left_join(taxa_repset, by = "subj_accession")
+
+# looks like 9 fungal isolates from Sanger did not match anything in the ITS short read data at any percent identity whatsoever
+# percent of fungal isolates we Sanger seq'd that match ITS short read data
+100 * (241 - 9) / 241
+# 96.26556
+
+range(SangerITSshort_clean$Perc_identity_match)
+mean(SangerITSshort_clean$Perc_identity_match)
+# percent identities range from 83.673 to 100, with mean 97.327
+
+# make a histogram of distribution of percent identities to make sure they tend higher
+# jpeg(filename = "match_hist.jpeg",
+#      width = 6, height = 3, units = "in", res = 300)
+hist(SangerITSshort_clean$Perc_identity_match,
+     main = "Histogram of percent identity match distribution \nbetween Sanger sequences and ITS short reads",
+     xlab = "Percent identity match between Sanger sequences and ITS short reads") 
+# dev.off()
+# most are on the higher end, this might be a useful supplementary figure just to show this distribution of percent identity matches are fairly high
+
+```
+
+```{r stacked bar chart of ITS short reads only}
+library(mctoolsr)
+
+#load data into R
+mapfp <- "DevelopmentalBorealToad_metadata_USEARCH_V2.txt"
+tabfp <- "otutab_wTax_noChloroMitoSingl.txt"
+input <- load_taxa_table(tab_fp = tabfp, map_fp = mapfp, 
+                         filter_cat = "Life_Stage_Simplified", 
+                         filter_vals = c("Primer_blank", "NoTemplateControl", NA)) 
+# 221 samples loaded
+
+# make taxa summary at genus level
+taxa_smry <- summarize_taxonomy(input = input, level = 6)
+# re-order 
+lifeenv_list <- c("Soil", "Sediment", "Water", "Eggs",
+                   "Tadpole", "Metamorph", "Subadult", "Adult")
+input$map_loaded$Life_Stage_Simplified <-
+    factor(input$map_loaded$Life_Stage_Simplified,
+           levels = lifeenv_list)
+#show top 10 most abundant genera on stacked bar charts
+ITSshort_stacked <- plot_taxa_bars(tax_table = taxa_smry,
+                                   metadata_map = input$map_loaded,
+                                   type_header = "Life_Stage_Simplified", num_taxa = 10)
+ITSshort_stacked
+# ggsave("ITSshort_stacked.jpg", ITSshort_stacked, dpi = 300,
+#        width = 14, height = 7)
+```
+
+```{r Proportion of reads from habitat or host ITS short reads that matched Sanger sequences of cultured fungal isolates}
+# graph of percent of ITS short reads that match cultured Sanger isolates across different host/habitat types
+
+# filter ITS short read data by matched-to-Sanger-isolates only
+ITSshortSanger_OTUlist <- unique(SangerITSshort_clean$Subj_ref_seq_ID)
+input_filtITSshortSanger <- filter_taxa_from_input(input = input,
+                                                   taxa_IDs_to_keep = ITSshortSanger_OTUlist)
+
+# calculate how many percent reads per sample type
+# make a small mapping file with only the sample types for each sample ID
+small_map <- input_filtITSshortSanger$map_loaded %>%
+    rownames_to_column("Sample_ID") %>%
+    select(Sample_ID, Life_Stage_Simplified)
+# add the above to the data loaded taxa table and calculate sums for each OTU
+ITSshortSanger_plotdata <- as.data.frame(t(input_filtITSshortSanger$data_loaded)) %>%
+    rownames_to_column("Sample_ID") %>%
+    mutate(OTUsum = rowSums(as.data.frame(t(input_filtITSshortSanger$data_loaded)))) %>%
+    inner_join(small_map, by = "Sample_ID") %>%
+    group_by(Life_Stage_Simplified) %>%
+    summarise(SampTypeSums = sum(OTUsum)) %>%
+    mutate(percReads = 100 * (SampTypeSums / sum(SampTypeSums)))
+
+# make a plot of data
+matchedseqs_samptype <- ggplot(data = ITSshortSanger_plotdata, 
+                               aes(x = Life_Stage_Simplified,
+                                   y = percReads)) +
+    geom_bar(stat = "identity") +
+    ylab("Proportion of reads from habitat or host ITS short reads \nthat matched Sanger sequences of cultured fungal isolates") +
+    theme(axis.text.x = element_text(angle = 25, hjust = 1, size = 10),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 10)) +
+    annotate("rect", xmin = 0.5, ymin = -Inf, 
+                 xmax = 3.5, ymax = Inf,
+             fill = habitat_color, alpha = 0.3) +
+    annotate("rect", xmin = 3.5, ymin = -Inf, 
+                 xmax = 8.5, ymax = Inf,
+             fill = host_color, alpha = 0.3) +
+    annotate("label", x = 2, y = 50, 
+             label = "Habitat", size = 5) +
+    annotate("label", x = 6, y = 50, 
+             label = "Host", size = 5)
+matchedseqs_samptype
+# ggsave(filename = "matchedseqs_samptype.jpg",
+#        plot = matchedseqs_samptype,
+#        width = 10, height = 5, dpi = 300)
+
+
+```
+
+
+
+## Q2: Does inhibition occur with fungi vs. Bd?
+```{r fungi vs. Bd inhibition}
+## fig of inhibition over time, separated by sample
+# clean up the data
+fung_time_plot <- ggplot(data = fung_time, aes(x = Time, y = Mean, 
+                                               group = Strain_name,
+                                               color = Isolate_source)) +
+    geom_errorbar(mapping = aes(ymin = (Mean - SE), ymax = (Mean + SE)),
+                  width = 0.5) +
+    geom_line() +
+    geom_point() +
+    facet_wrap(~Strain_name, scales = "free_y") +
+    ylab("Mean Diameter of Bd Inhibition Zone (mm)") +
+    scale_color_viridis_d()
+fung_time_plot
+# ggsave(filename = "fung_time_plot.png",
+#        path = "Prelim_Figs",
+#        plot = fung_time_plot,
+#        width = 12, height = 7, dpi = 300)
+
+
+
+## final day of inhibition plot
+
+# ANOVA and tukey post hoc for the figure
+fung_inhib_full <- read.delim("Fungal_inhibfull.txt", sep = "\t",
+                        header = T)
+aov_inhibfinal <- aov(Value ~ Strain_name, data = fung_inhib_full)
+summary(aov_inhibfinal) # significant, p = 1.66e-13
+tuk_inhibfinal <- TukeyHSD(aov_inhibfinal)
+tuk_inhibfinal
+tuklabels_inhibfinal <- generate_label_df(tuk_inhibfinal, "Strain_name")
+
+
+# filter only final day data
+fung_time_final <- fung_time %>%
+    dplyr::filter(Time == "Day 8") %>%
+    inner_join(tuklabels_inhibfinal, by = "Strain_name") # add tukey group labels
+ordered_treats <- as.list(fung_time_final$Strain_name) # list of ordered bacteria names based on sample type order
+fung_time_final$Strain_name <- factor(fung_time_final$Strain_name, 
+                                          levels = ordered_treats)
+
+fung_Tfinal_plot <- ggplot(data = fung_time_final, aes(x = Strain_name, 
+                                                       y = Mean)) +
+    geom_col() +
+    geom_errorbar(mapping = aes(ymin = (Mean - SE), ymax = (Mean + SE))) +
+    annotate("rect", xmin = 0.5, ymin = -Inf, 
+                 xmax = 9.5, ymax = Inf,
+             fill = "#440154", alpha = 0.3) +
+    annotate("rect", xmin = 9.5, ymin = -Inf, 
+                 xmax = 11.5, ymax = Inf,
+             fill = "#3b528b", alpha = 0.3) +
+    annotate("rect", xmin = 11.5, ymin = -Inf, 
+                 xmax = 12.5, ymax = Inf,
+             fill = "#21918c", alpha = 0.3) +
+    annotate("rect", xmin = 12.5, ymin = -Inf, 
+                 xmax = 15.5, ymax = Inf,
+             fill = "#5ec962", alpha = 0.3) +
+    annotate("rect", xmin = 15.5, ymin = -Inf, 
+                 xmax = 16.5, ymax = Inf,
+             fill = "#fde725", alpha = 0.3) +
+    annotate("label", x = 5.5, y = 100, 
+             label = "Eggs", size = 5) +
+    annotate("label", x = 10.5, y = 100, 
+             label = "Tadpole", size = 5) +
+    annotate("label", x = 12, y = 100, 
+             label = "Metamorph", size = 5) +
+    annotate("label", x = 14, y = 100, 
+             label = "Subadult", size = 5) +
+    annotate("label", x = 16, y = 100, 
+             label = "Adult", size = 5) +
+    geom_text(aes(y = Mean + SE, label = Letters),
+                  position = position_dodge(width = 0.9), color = "black",
+                  vjust = -0.5, size = 6, show.legend = FALSE) +
+    ylab("Mean Diameter of Bd Inhibition Zone (mm)") +
+    theme(axis.text.x = element_text(angle = 75, hjust = 1, size = 14),
+          axis.title.x = element_blank(),
+          axis.text.y = element_text(size = 10),
+          axis.title.y = element_text(size = 14))
+fung_Tfinal_plot
+# ggsave(filename = "fung_Tfinal_plot.png",
+#        path = "Prelim_Figs",
+#        plot = fung_Tfinal_plot,
+#        width = 13, height = 7, dpi = 300)
+
+
+```
+
+Only host isolate was one of the Cladosporiums, and no Cladosporium isolates were Bd inhibitive. The rest were isolated from the habitat - maybe tracks with bacteria patterns as well and other trends we know about toads. Neobulgaria and Pseudeurotium all had inhibition against Bd. 
+
+
+## Q3: Did morphology or growth rate of fungi change when co-cultured with Bd?
+```{r growth rate changes}
+# read in starting file
+growthFung_forttest <- read.table("FungGrowth_forttest.txt", sep = "\t",
+                                  header = T)
+# re-order by isolate source
+growthFung_forttest$Isolate_source <- factor(growthFung_forttest$Isolate_source, 
+                                             levels = life_list)
+
+# run stats, one t-test per isolate
+list_fung <- as.list(fung_growth$Strain_name) # make list of fungi
+fung_output_stats <- list() # make an output data list
+for (i in 1:length(list_fung)) {
+    
+    # filter the big data file at the start of this chunk by strain name
+    filt_bystrain <- dplyr::filter(growthFung_forttest,
+                                   Strain_name %in% list_fung[i])
+    
+    # run t-test comparing Bd to no-Bd control plate growth rates
+    fung_output_stats[[paste0(list_fung[i], "_ttest")]] <- t.test(Growth_rate ~ Trial_Type,
+                                                                  data = filt_bystrain,
+                                                                  paired = T)
+    
+    # make a list of all the relevant stats from the t-tests
+    fung_output_stats[["pvalue_ttest"]][[paste(list_fung[i])]] <- fung_output_stats[[paste0(list_fung[i], "_ttest")]][["p.value"]]
+    fung_output_stats[["tstat_ttest"]][[paste(list_fung[i])]] <- fung_output_stats[[paste0(list_fung[i], "_ttest")]][["statistic"]]
+    fung_output_stats[["meandiff_ttest"]][[paste(list_fung[i])]] <- fung_output_stats[[paste0(list_fung[i], "_ttest")]][["estimate"]]
+    fung_output_stats[["SE_ttest"]][[paste(list_fung[i])]] <- fung_output_stats[[paste0(list_fung[i], "_ttest")]][["stderr"]]
+    
+}
+
+# make a list of summary stats
+summary_ttest <- as.data.frame(t(as.data.frame(fung_output_stats$pvalue_ttest))) %>% 
+    rownames_to_column("Strain_name") %>%
+    rename(pvalue_ttest = V1) %>%
+    inner_join(rownames_to_column(as.data.frame(t(as.data.frame(fung_output_stats$tstat_ttest))), "Strain_name"),
+               by = "Strain_name") %>%
+    inner_join(rownames_to_column(as.data.frame(t(as.data.frame(fung_output_stats$meandiff_ttest))), "Strain_name"),
+               by = "Strain_name") %>%
+    inner_join(rownames_to_column(as.data.frame(t(as.data.frame(fung_output_stats$SE_ttest))), "Strain_name"),
+               by = "Strain_name") %>%
+    rename(stderr = V1)
+# write.table(summary_ttest, "summary_ttest.txt", sep = "\t", quote = F)
+
+# make graph
+# re-order some things first
+fung_growth2 <- read.delim("Fungal_growth2.txt", sep = "\t",
+                        header = T)
+fung_growth2$Isolate_source <- factor(fung_growth2$Isolate_source, 
+                                             levels = life_list)
+ordered_treats <- as.list(unique(fung_growth2$Strain_name)) # list of ordered bacteria names based on sample type order
+fung_growth2$Strain_name <- factor(fung_growth2$Strain_name, 
+                                   levels = ordered_treats)
+
+fung_growth_plot <- ggplot(data = fung_growth2, aes(x = Category, y = Mean,
+                               fill = Isolate_source)) +
+    geom_col() +
+    geom_errorbar(mapping = aes(ymin = (Mean - stderr_ttest), ymax = (Mean + stderr_ttest)),
+                  width = 0.5) +
+    ylab(bquote("Mean Area of Fungal Colony"~(mm^2))) +
+    theme(axis.text.x = element_text(angle = 70, hjust = 1, size = 12),
+          axis.title.x = element_blank(),
+          axis.text.y = element_text(size = 10),
+          axis.title.y = element_text(size = 12),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 14),
+          strip.text = element_text(size = 11)) +
+    scale_fill_viridis_d(name = "Isolate Source") +
+    facet_wrap(~Strain_name, scales = "free_y")
+fung_growth_plot
+# ggsave(filename = "fung_growth.png",
+#        path = "Prelim_Figs",
+#        plot = fung_growth_plot,
+#        width = 12.5, height = 7, dpi = 300)
+
+```
+
+Only BTF_36 (Neobulgaria) and BTF_60 (Helotiales) could be maybe significant. P-values are rather high overall, but those two have p > 0.10. Cladosporiums (BTF_22 and BTF_24) have non-overlapping std errors but their p values are ~0.14 so not great either. Possibly my p-value cutoff should be 0.15 though because of few replicates, not possible to control all parameters (esp. with temp in our lab), and things like genetic variability. I used a paired t-test because the fungi all came from the same plate (sometimes these have more than one colony but usually one big colony, in any case, passaged from one plug) but they could still be genetically different across the plate. Also, is this pseudoreplication? Not really tractable to do it in any other way though since one plate = one genetically distinct isolate that we are testing and this was difficult to scale up to begin with.
+
+
