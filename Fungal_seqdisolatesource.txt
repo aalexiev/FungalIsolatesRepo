@@ -28,7 +28,7 @@ BTF_126	Subadult	1	Ustilentyloma
 BTF_127	Subadult	1	Geomyces
 BTF_128	Subadult	1	Phaeosphaeria
 BTF_129	Subadult	1	Rutola
-BTF_13	Eggs	1	Unknown (bad hit)
+BTF_13	Eggs	1	Unknown (no close hit)
 BTF_130	Subadult	1	Didymella
 BTF_131	Adult	1	Vishniacozyma
 BTF_132	Adult	1	Cladosporium
@@ -88,7 +88,7 @@ BTF_53	Eggs	1	Strickeria
 BTF_54	Eggs	1	Pseudeurotium
 BTF_55	Eggs	1	Pseudeurotium
 BTF_59	Eggs	1	Pseudozyma
-BTF_60	Eggs	1	Unknown (bad hit)
+BTF_60	Eggs	1	Unknown (no close hit)
 BTF_62	Eggs	1	Dimorphospora
 BTF_63	Eggs	1	Acanthophysellum
 BTF_65	Eggs	1	Penicillium
@@ -111,7 +111,7 @@ BTF_82	Eggs	1	Cladosporium
 BTF_83	Eggs	1	Cladosporium
 BTF_84	Eggs	1	Penicillium
 BTF_85	Eggs	1	Neobulgaria
-BTF_86	Eggs	1	Unknown (bad hit)
+BTF_86	Eggs	1	Unknown (no close hit)
 BTF_87	Eggs	1	Penicillium
 BTF_89	Eggs	1	Cladosporium
 BTF_9	Eggs	1	Vishniacozyma

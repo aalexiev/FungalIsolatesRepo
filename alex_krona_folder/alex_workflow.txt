@@ -1,0 +1,39 @@
+#### Workflow for reverse complement files ####
+
+# count number of sequences in fasta file so we know when we screw up later
+grep -c ">" fungalITSwoutgroup.fasta 
+# total is 266
+
+# Separate fasta into files and rename with headers
+  
+while read line; do     if [[ ${line:0:1} == '>' ]];     then         outfile=${line#>};         echo $line > $outfile;     else         echo $line >> $outfile;     fi; done < fungalITSNOogroup.fasta 
+
+# put all forward and reverse files into respective folders - first make "forward" and "reverse" folders
+# make a forward.txt file that identifies your target string. text is "ITS1"
+  
+for i in alex/*.ab1; do  
+  if grep -Fq -f forward.txt <<< "$i"; 
+  then  
+    mv -t forward "$i"  
+  else  
+  mv -t reverse "$i"
+  fi  
+done  
+
+# Count number of files in each folder
+ls | wc -l
+# reverse = 123, forward=143. woo I didn't screw up
+
+# Reverse all files in reverse folder. move to reverse folder
+# Had to use seqtk for this
+ for file in *.ab1; do seqtk seq -r ${file} > ${file}_revC.ab1; done;
+
+# Replace - with _ in filenames (couldn't get the next step to work correctly otherwise)
+
+# Put new reverse files and the untouched forward files in a folder together.
+# Use this to combine files with the same prefix before "-"
+for i in $(ls *.ab1 | cut -f1-2 -d_ | sort -u); do
+     cat "$i"_*.ab1 >> "$i.combined.ab1"; 
+ done
+ 
+

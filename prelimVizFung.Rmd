@@ -12,6 +12,7 @@ These are the preliminary visualizations and statistics for the fungal Bd co-cul
 knitr::opts_chunk$set(echo = TRUE)
 sessionInfo()
 library(ggplot2)
+library(ggpattern)
 library(tidyverse)
 library(multcompView)
 library(viridis)
@@ -290,13 +291,36 @@ Only host isolate was one of the Cladosporiums, and no Cladosporium isolates wer
 
 
 ## Q3: Did morphology or growth rate of fungi change when co-cultured with Bd?
-```{r growth rate changes}
+```{r growth rate changes: stats}
 # read in starting file
 growthFung_forttest <- read.table("FungGrowth_forttest.txt", sep = "\t",
                                   header = T)
 # re-order by isolate source
 growthFung_forttest$Isolate_source <- factor(growthFung_forttest$Isolate_source, 
                                              levels = life_list)
+
+# check for normality
+# Filter for the numeric variables
+meta_num <- growthFung_forttest[, sapply(growthFung_forttest, is.numeric)]
+
+# Test each of the continuous variables for normality
+list_fung <- as.list(fung_growth$Strain_name)
+fung_shapiro <- list()
+for (i in 1:length(list_fung)) {
+    
+    #filter by strain
+    filt_bystrain <- dplyr::filter(growthFung_forttest,
+                                   Strain_name %in% list_fung[i])
+    
+    # run t-test comparing Bd to no-Bd control plate growth rates
+    fung_shapiro[[paste0(list_fung[i], "_test")]] <- shapiro.test(filt_bystrain$Growth_rate)
+    
+    # make a list of pvals
+    fung_shapiro[["pvalue"]][[paste(list_fung[i])]] <- fung_shapiro[[paste0(list_fung[i], "_test")]][["p.value"]]
+    
+}
+fung_shapiro$pvalue
+# all are above 0.05 except Phaeosphaeria, so I will run the t-test on everything and just keep in mind Phaeosphaeria is not normal so we cannot evaluate it
 
 # run stats, one t-test per isolate
 list_fung <- as.list(fung_growth$Strain_name) # make list of fungi
@@ -332,7 +356,9 @@ summary_ttest <- as.data.frame(t(as.data.frame(fung_output_stats$pvalue_ttest)))
                by = "Strain_name") %>%
     rename(stderr = V1)
 # write.table(summary_ttest, "summary_ttest.txt", sep = "\t", quote = F)
+```
 
+```{r growth rate changes: bar plot}
 # make graph
 # re-order some things first
 fung_growth2 <- read.delim("Fungal_growth2.txt", sep = "\t",
@@ -363,6 +389,38 @@ fung_growth_plot
 #        path = "Prelim_Figs",
 #        plot = fung_growth_plot,
 #        width = 12.5, height = 7, dpi = 300)
+```
+
+```{r growth rate changes: bar plot sep bars}
+
+# make a graph showing each of the bars separately without mean or SE
+growthFung_forttest$Isolate_source <- factor(growthFung_forttest$Isolate_source,
+                                             levels = life_list)
+ordered_treats <- as.list(unique(growthFung_forttest$Strain_name)) # list of ordered bacteria names based on sample type order
+growthFung_forttest$Strain_name <- factor(growthFung_forttest$Strain_name, 
+                                   levels = ordered_treats)
+
+fung_growth_plot_sepbars <- ggplot(data = growthFung_forttest, aes(x = Trial_Type_unique, 
+                                                                   y = Growth_rate,
+                                                                   fill = Isolate_source)) +
+    geom_col(aes(alpha = Trial_Type), color = "black") +
+    scale_alpha_manual(values = c(1, 0.6)) +
+    ylab(bquote("Area of Fungal Colony"~(mm^2))) +
+    theme(axis.text.x = element_blank(),
+          axis.title.x = element_blank(),
+          axis.text.y = element_text(size = 10),
+          axis.title.y = element_text(size = 12),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 14),
+          strip.text = element_text(size = 11)) +
+    scale_fill_viridis_d(name = "Isolate Source") +
+    labs(alpha = "Trial Type") +
+    facet_wrap(~Strain_name, scales = "free_y")
+fung_growth_plot_sepbars
+# ggsave(filename = "fung_growth_sepbars.png",
+#        path = "Prelim_Figs",
+#        plot = fung_growth_plot_sepbars,
+#        width = 13, height = 7, dpi = 300)
 
 ```
 
